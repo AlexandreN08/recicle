@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "560153874536",
+    "project_id": "reciclar-23c9f",
+    "storage_bucket": "reciclar-23c9f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560153874536:android:c506f1086587dbb1542bdd",
+        "android_client_info": {
+          "package_name": "com.example.recicle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "560153874536-nmn859svjo5hd6bc1qise3qvk972djpj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH99B_gQPTz2_ACYe-qRplsO53mrhEseA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "560153874536-nmn859svjo5hd6bc1qise3qvk972djpj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

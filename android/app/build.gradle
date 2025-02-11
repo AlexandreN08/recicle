@@ -1,0 +1,44 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // O plugin Flutter deve ser aplicado após os plugins Android e Kotlin.
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services" // Ajuste aqui para usar a sintaxe moderna do Gradle
+}
+
+android {
+    namespace = "com.example.recicle"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId = "com.example.recicle"
+        minSdk = 23
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // Adicione sua configuração de assinatura para builds de release.
+            signingConfig = signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+// O Google Services deve ser aplicado fora da seção `plugins` (compatibilidade com versões antigas).
+apply plugin: 'com.google.gms.google-services'

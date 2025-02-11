@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
@@ -12,7 +13,7 @@ void main() async {
     print('Firebase inicializado com sucesso!');
   } catch (e) {
     print('Erro ao inicializar o Firebase: $e');
-    return; // Se o Firebase falhar na inicialização, impede a execução do app
+    return;
   }
   runApp(MyApp());
 }
@@ -46,7 +47,39 @@ class _DescarteScreenState extends State<DescarteScreen> {
     {'title': 'Eletrônico', 'color': Colors.blue},
   ];
 
-  // Função para selecionar o horário
+  Future<Position?> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ative a localização para continuar.')),
+      );
+      return null;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permissão de localização negada.')),
+        );
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Permissão de localização permanentemente negada.')),
+      );
+      return null;
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   Future<void> _selectTime() async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -60,7 +93,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
     }
   }
 
-  // Função para selecionar a imagem da galeria
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     try {
@@ -81,7 +113,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
     }
   }
 
-  // Função para tirar uma foto
   Future<void> _captureImage() async {
     final picker = ImagePicker();
     try {
@@ -102,7 +133,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
     }
   }
 
-  // Função para salvar os dados no Firestore
   Future<void> _saveToFirestore() async {
     if (selectedMaterials.isEmpty || selectedImage == null || selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,22 +146,28 @@ class _DescarteScreenState extends State<DescarteScreen> {
     });
 
     try {
-      print('Preparando para salvar no Firestore...'); // Log de depuração
+      Position? position = await _getCurrentLocation();
+      if (position == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
 
-      // Converter a imagem para Base64
       final bytes = await selectedImage!.readAsBytes();
       final base64Image = base64Encode(bytes);
-      print('Imagem convertida para Base64.'); // Log de depuração
 
-      // Salvar os dados no Firestore
-      final docRef = await FirebaseFirestore.instance.collection('descartes').add({
+      await FirebaseFirestore.instance.collection('descartes').add({
         'materials': selectedMaterials,
         'time': '${selectedTime!.hour}:${selectedTime!.minute}',
-        'imageBase64': base64Image, // Salvar a imagem como Base64
-        'createdAt': FieldValue.serverTimestamp(), // Timestamp gerado pelo Firestore
+        'imageBase64': base64Image,
+        'location': {
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        },
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      print('Documento criado com ID: ${docRef.id}'); // Log de depuração
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Dados salvos com sucesso!')),
       );
@@ -142,7 +178,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
         selectedTime = null;
       });
     } catch (error) {
-      print('Erro ao salvar no Firestore: $error'); // Log de erro
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao salvar: $error')),
       );
@@ -167,13 +202,7 @@ class _DescarteScreenState extends State<DescarteScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Center(
-                  child: Text(
-                    'Selecione os materiais a serem descartados:',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                Text('Selecione os materiais:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
                 GridView.builder(
                   physics: NeverScrollableScrollPhysics(),
@@ -190,78 +219,38 @@ class _DescarteScreenState extends State<DescarteScreen> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          if (isSelected) {
-                            selectedMaterials.remove(material['title']);
-                          } else {
-                            selectedMaterials.add(material['title']);
-                          }
+                          isSelected ? selectedMaterials.remove(material['title']) : selectedMaterials.add(material['title']);
                         });
                       },
                       child: Card(
-                        color: isSelected
-                            ? material['color'].withOpacity(0.6)
-                            : material['color'],
-                        elevation: isSelected ? 8 : 2,
-                        shadowColor: isSelected ? Colors.black : null,
+                        color: isSelected ? material['color'].withOpacity(0.6) : material['color'],
                         child: Center(
-                          child: Text(
-                            material['title'],
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          child: Text(material['title'], style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     );
                   },
                 ),
                 SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    'Selecione ou tire uma foto dos materiais:',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                Text('Imagem do descarte:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
-                      onPressed: _captureImage,
-                      child: Text('Tirar Foto'),
-                    ),
-                    ElevatedButton(
-                      onPressed: _pickImage,
-                      child: Text('Selecionar Foto'),
-                    ),
+                    ElevatedButton(onPressed: _captureImage, child: Text('Tirar Foto')),
+                    ElevatedButton(onPressed: _pickImage, child: Text('Selecionar Foto')),
                   ],
                 ),
+                if (selectedImage != null) Image.file(selectedImage!, height: 150, fit: BoxFit.cover),
                 SizedBox(height: 16),
-                if (selectedImage != null)
-                  Image.file(selectedImage!, height: 150, fit: BoxFit.cover),
-                SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    'Selecione o horário disponível para coleta:',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _selectTime,
-                  child: Text(selectedTime == null
-                      ? 'Selecionar Horário'
-                      : 'Horário: ${selectedTime!.format(context)}'),
-                ),
+                Text('Horário para coleta:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ElevatedButton(onPressed: _selectTime, child: Text(selectedTime == null ? 'Selecionar Horário' : 'Horário: ${selectedTime!.format(context)}')),
                 SizedBox(height: 16),
                 isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: _saveToFirestore,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green),
-                        child: Text('Salvar Descarte'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                        child: Text('Salvar Descarte', style: TextStyle(fontSize: 18)),
                       ),
               ],
             ),

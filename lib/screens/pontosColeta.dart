@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PontosColetaScreen extends StatefulWidget {
   @override
@@ -10,6 +11,20 @@ class PontosColetaScreen extends StatefulWidget {
 }
 
 class _PontosColetaScreenState extends State<PontosColetaScreen> {
+  // Função para solicitar permissões de localização
+  Future<void> requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.request();
+    if (status.isGranted) {
+      // Permissão concedida, podemos continuar
+      print("Permissão de localização concedida!");
+    } else {
+      // Permissão negada
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Permissão de localização negada')),
+      );
+    }
+  }
+
   // Função para converter Base64 para imagem
   Image _convertBase64ToImage(String? base64Image) {
     if (base64Image != null && base64Image.isNotEmpty) {
@@ -38,25 +53,28 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
     return "Endereço não disponível";
   }
 
-// Função para abrir o Google Maps corrigida
-void _openGoogleMaps(double latitude, double longitude) async {
-  String googleMapsUrl = "geo:$latitude,$longitude"; // Para Android e iOS
-  String googleMapsWebUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"; // Para Web
+  // Função para abrir o Google Maps corrigida
+  void _openGoogleMaps(double latitude, double longitude) async {
+    String googleMapsUrl = "geo:$latitude,$longitude"; // Para Android e iOS
+    String googleMapsWebUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"; // Para Web
 
-  if (await canLaunch(googleMapsUrl)) {
-    await launch(googleMapsUrl);
-  } else if (await canLaunch(googleMapsWebUrl)) {
-    await launch(googleMapsWebUrl);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Não foi possível abrir o Google Maps')),
-    );
+    // Tentando abrir no Google Maps
+    if (await canLaunch(googleMapsUrl)) {
+      await launch(googleMapsUrl);
+    } else if (await canLaunch(googleMapsWebUrl)) {
+      await launch(googleMapsWebUrl);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possível abrir o Google Maps')),
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
+    // Solicitar permissões de localização quando a tela for carregada
+    requestLocationPermission();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Pontos de Coleta'),
@@ -146,7 +164,6 @@ void _openGoogleMaps(double latitude, double longitude) async {
                                 style: TextStyle(fontSize: 14, color: Colors.grey),
                               ),
                               SizedBox(height: 12),
-
                               // Botão para abrir no Google Maps
                               if (latitude != null && longitude != null)
                                 Center(

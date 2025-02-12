@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:recicle/screens/descarte_screen.dart';
-import 'package:recicle/screens/pontosColeta.dart';
+import 'package:recicle/screens/descarte_screen.dart';  // Importe a tela de descarte
+import 'package:recicle/screens/pontosColeta.dart';   // Importe a tela de pontos de coleta
+import 'package:recicle/screens/meus_descartes.dart'; // Importe a tela correta de Meus Descartes
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -74,6 +75,18 @@ class HomeScreen extends StatelessWidget {
               title: Text('Sair'),
               onTap: () {
                 _logout(context); // Faz o logoff
+              },
+            ),
+            // Corrigir aqui para direcionar para a tela correta de Meus Descartes
+            ListTile(
+              leading: Icon(Icons.view_list),
+              title: Text('Meus Descartes'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o Drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MeusDescartesScreen()), // Direcionando para a tela correta
+                );
               },
             ),
           ],
@@ -158,23 +171,6 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Configurações')),
       body: Center(
         child: Text('Aqui estão as configurações do aplicativo.'),
-      ),
-    );
-  }
-}
-
-class DiscardScreen extends StatelessWidget {
-  const DiscardScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Descartar Reciclável'),
-        backgroundColor: Colors.green,
-      ),
-      body: Center(
-        child: Text('Tela de Descarte de Materiais Recicláveis'),
       ),
     );
   }

@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io';
@@ -40,11 +41,11 @@ class _DescarteScreenState extends State<DescarteScreen> {
   bool isLoading = false;
 
   final List<Map<String, dynamic>> materials = [
-    {'title': 'Vidro', 'color': Colors.green},
-    {'title': 'Plástico', 'color': Colors.red},
-    {'title': 'Papelão', 'color': Colors.orange},
-    {'title': 'Metal', 'color': Colors.yellow},
-    {'title': 'Eletrônico', 'color': Colors.blue},
+    {'title': 'Vidro', 'color': Colors.green, 'icon': Icons.wine_bar},
+    {'title': 'Plástico', 'color': Colors.red, 'icon': Icons.recycling},
+    {'title': 'Papelão', 'color': Colors.blue, 'icon': Icons.archive},
+    {'title': 'Metal', 'color': Colors.yellow, 'icon': Icons.device_hub},
+    {'title': 'Eletrônico', 'color': Colors.orange, 'icon': Icons.phone_iphone},
   ];
 
   Future<Position?> _getCurrentLocation() async {
@@ -146,6 +147,19 @@ class _DescarteScreenState extends State<DescarteScreen> {
     });
 
     try {
+      // Obtém o UID do usuário autenticado
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Você precisa estar logado para fazer um descarte.')),
+        );
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
       Position? position = await _getCurrentLocation();
       if (position == null) {
         setState(() {
@@ -158,6 +172,7 @@ class _DescarteScreenState extends State<DescarteScreen> {
       final base64Image = base64Encode(bytes);
 
       await FirebaseFirestore.instance.collection('descartes').add({
+        'userId': user.uid,  // Adiciona o UID do usuário
         'materials': selectedMaterials,
         'time': '${selectedTime!.hour}:${selectedTime!.minute}',
         'imageBase64': base64Image,
@@ -202,7 +217,15 @@ class _DescarteScreenState extends State<DescarteScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Selecione os materiais:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  'Selecione os materiais:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor, 
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 SizedBox(height: 10),
                 GridView.builder(
                   physics: NeverScrollableScrollPhysics(),
@@ -219,20 +242,36 @@ class _DescarteScreenState extends State<DescarteScreen> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          isSelected ? selectedMaterials.remove(material['title']) : selectedMaterials.add(material['title']);
+                          isSelected
+                              ? selectedMaterials.remove(material['title'])
+                              : selectedMaterials.add(material['title']);
                         });
                       },
                       child: Card(
                         color: isSelected ? material['color'].withOpacity(0.6) : material['color'],
                         child: Center(
-                          child: Text(material['title'], style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(material['icon'], size: 40, color: Colors.white),
+                              SizedBox(height: 8),
+                              Text(
+                                material['title'],
+                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
                 SizedBox(height: 16),
-                Text('Imagem do descarte:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  'Selecione uma imagem do material a ser descartado:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                  textAlign: TextAlign.center,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -242,8 +281,17 @@ class _DescarteScreenState extends State<DescarteScreen> {
                 ),
                 if (selectedImage != null) Image.file(selectedImage!, height: 150, fit: BoxFit.cover),
                 SizedBox(height: 16),
-                Text('Horário para coleta:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ElevatedButton(onPressed: _selectTime, child: Text(selectedTime == null ? 'Selecionar Horário' : 'Horário: ${selectedTime!.format(context)}')),
+                Text(
+                  'Selecione o Horário disponível para coleta:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                  textAlign: TextAlign.center,
+                ),
+                ElevatedButton(
+                  onPressed: _selectTime,
+                  child: Text(selectedTime == null
+                      ? 'Selecionar Horário'
+                      : 'Horário: ${selectedTime!.format(context)}'),
+                ),
                 SizedBox(height: 16),
                 isLoading
                     ? CircularProgressIndicator()

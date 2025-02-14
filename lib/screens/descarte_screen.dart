@@ -279,26 +279,29 @@ class _DescarteScreenState extends State<DescarteScreen> {
                     ElevatedButton(onPressed: _pickImage, child: Text('Selecionar Foto')),
                   ],
                 ),
-                if (selectedImage != null) Image.file(selectedImage!, height: 150, fit: BoxFit.cover),
+                SizedBox(height: 16),
+                selectedImage != null
+                    ? Image.file(selectedImage!, width: 200, height: 200)
+                    : SizedBox(height: 200, child: Center(child: Text('Nenhuma imagem selecionada'))),
                 SizedBox(height: 16),
                 Text(
-                  'Selecione o Horário disponível para coleta:',
+                  'Selecione o horário para o descarte:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-                  textAlign: TextAlign.center,
                 ),
                 ElevatedButton(
                   onPressed: _selectTime,
-                  child: Text(selectedTime == null
-                      ? 'Selecionar Horário'
-                      : 'Horário: ${selectedTime!.format(context)}'),
+                  child: Text(
+                    selectedTime != null
+                        ? 'Hora selecionada: ${selectedTime!.format(context)}'
+                        : 'Escolher hora',
+                  ),
                 ),
                 SizedBox(height: 16),
                 isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: _saveToFirestore,
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: Text('Salvar Descarte', style: TextStyle(fontSize: 18)),
+                        child: Text('Salvar'),
                       ),
               ],
             ),

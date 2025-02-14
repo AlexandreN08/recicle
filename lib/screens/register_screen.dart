@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importando Firestore
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController(); // Controlador para o nome completo
 
   RegisterScreen({super.key});
 
@@ -17,13 +19,23 @@ class RegisterScreen extends StatelessWidget {
     }
 
     try {
+      // Criação do usuário no Firebase Authentication
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
+
+      // Salvar informações adicionais no Firestore
+      await FirebaseFirestore.instance.collection('cadastros').doc(userCredential.user!.uid).set({
+        'nome_completo': fullNameController.text,
+        'email': emailController.text,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cadastro realizado com sucesso!')),
       );
+
       Navigator.pop(context); // Volta para a tela anterior após o cadastro
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -60,6 +72,15 @@ class RegisterScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
+            // Campo para nome completo
+            TextField(
+              controller: fullNameController,
+              decoration: InputDecoration(
+                labelText: 'Nome Completo',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
             TextField(
               controller: emailController,
               decoration: InputDecoration(

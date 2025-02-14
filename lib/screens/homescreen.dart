@@ -7,6 +7,7 @@ import 'package:recicle/screens/meus_descartes.dart'; // Importe a tela correta 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  // Função para fazer logout
   Future<void> _logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -29,7 +30,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.notifications, color: Colors.white),
             onPressed: () {
-              // Ação ao clicar no ícone
+              // Ação ao clicar no ícone de notificações (você pode adicionar a lógica aqui)
             },
           ),
         ],
@@ -77,7 +78,6 @@ class HomeScreen extends StatelessWidget {
                 _logout(context); // Faz o logoff
               },
             ),
-            // Corrigir aqui para direcionar para a tela correta de Meus Descartes
             ListTile(
               leading: Icon(Icons.view_list),
               title: Text('Meus Descartes'),
@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pop(context); // Fecha o Drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MeusDescartesScreen()), // Direcionando para a tela correta
+                  MaterialPageRoute(builder: (context) => MeusDescartesScreen()), // Direcionando para a tela de Meus Descartes
                 );
               },
             ),

@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;  // Pacote para redimensionar a imagem
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +38,7 @@ class DescarteScreen extends StatefulWidget {
 class _DescarteScreenState extends State<DescarteScreen> {
   List<String> selectedMaterials = [];
   File? selectedImage;
-  TimeOfDay? selectedTime;
+  DateTime? selectedDateTime;
   bool isLoading = false;
 
   final List<Map<String, dynamic>> materials = [
@@ -81,16 +82,31 @@ class _DescarteScreenState extends State<DescarteScreen> {
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<void> _selectTime() async {
-    final TimeOfDay? pickedTime = await showTimePicker(
+  Future<void> _selectDateTime() async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
 
-    if (pickedTime != null) {
-      setState(() {
-        selectedTime = pickedTime;
-      });
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          selectedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
     }
   }
 
@@ -134,8 +150,21 @@ class _DescarteScreenState extends State<DescarteScreen> {
     }
   }
 
+  // Função para redimensionar a imagem para reduzir seu tamanho
+  Future<String> _compressImage(File image) async {
+    final img.Image? imageFile = img.decodeImage(image.readAsBytesSync());
+    if (imageFile == null) {
+      throw Exception('Falha ao decodificar a imagem.');
+    }
+
+    final resizedImage = img.copyResize(imageFile, width: 800); // Reduz a largura para 800px
+    final compressedImage = File(image.path)..writeAsBytesSync(img.encodeJpg(resizedImage)); // Salva a imagem comprimida
+    final base64Image = base64Encode(compressedImage.readAsBytesSync());
+    return base64Image;
+  }
+
   Future<void> _saveToFirestore() async {
-    if (selectedMaterials.isEmpty || selectedImage == null || selectedTime == null) {
+    if (selectedMaterials.isEmpty || selectedImage == null || selectedDateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Preencha todos os campos antes de salvar!')),
       );
@@ -168,14 +197,13 @@ class _DescarteScreenState extends State<DescarteScreen> {
         return;
       }
 
-      final bytes = await selectedImage!.readAsBytes();
-      final base64Image = base64Encode(bytes);
+      final base64Image = await _compressImage(selectedImage!);
 
       await FirebaseFirestore.instance.collection('descartes').add({
         'userId': user.uid,  // Adiciona o UID do usuário
         'materials': selectedMaterials,
-        'time': '${selectedTime!.hour}:${selectedTime!.minute}',
-        'imageBase64': base64Image,
+        'time': selectedDateTime!.toIso8601String(),
+        'imageBase64': base64Image,  // Armazena a imagem como Base64
         'location': {
           'latitude': position.latitude,
           'longitude': position.longitude,
@@ -190,7 +218,7 @@ class _DescarteScreenState extends State<DescarteScreen> {
       setState(() {
         selectedMaterials = [];
         selectedImage = null;
-        selectedTime = null;
+        selectedDateTime = null;
       });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -285,15 +313,16 @@ class _DescarteScreenState extends State<DescarteScreen> {
                     : SizedBox(height: 200, child: Center(child: Text('Nenhuma imagem selecionada'))),
                 SizedBox(height: 16),
                 Text(
-                  'Selecione o horário para o descarte:',
+                  'Selecione o horário e a data para o descarte:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                  textAlign: TextAlign.center,
                 ),
                 ElevatedButton(
-                  onPressed: _selectTime,
+                  onPressed: _selectDateTime,
                   child: Text(
-                    selectedTime != null
-                        ? 'Hora selecionada: ${selectedTime!.format(context)}'
-                        : 'Escolher hora',
+                    selectedDateTime != null
+                        ? 'Data e Hora selecionadas: ${selectedDateTime!.toLocal()}'
+                        : 'Escolher Data e Hora',
                   ),
                 ),
                 SizedBox(height: 16),

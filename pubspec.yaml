@@ -44,6 +44,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   location: ^8.0.0
   flutter_local_notifications: ^18.0.1
+  image: ^3.0.1
 
 dev_dependencies:
   flutter_test:

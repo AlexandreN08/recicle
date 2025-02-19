@@ -52,7 +52,7 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
-        return "${place.street}, ${place.subLocality}, ${place.locality} - ${place.administrativeArea}";
+        return "${place.name}, ${place.thoroughfare}, ${place.subLocality}, ${place.locality} - ${place.administrativeArea}";
       }
     } catch (e) {
       print("Erro ao buscar endereço: $e");
@@ -61,8 +61,8 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
   }
 
   void _openGoogleMaps(double latitude, double longitude) async {
-    String googleMapsUrl = "geo:$latitude,$longitude";
-    String googleMapsWebUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
+    String googleMapsUrl = "google.navigation:q=$latitude,$longitude";
+    String googleMapsWebUrl = "https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${latitude},${longitude}";
 
     if (await canLaunch(googleMapsUrl)) {
       await launch(googleMapsUrl);

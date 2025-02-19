@@ -20,6 +20,16 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
     }
   }
 
+  // Função para confirmar a coleta e mudar o status para 'Coletado'
+  Future<void> _confirmarColeta(String docId) async {
+    try {
+      await FirebaseFirestore.instance.collection('descartes').doc(docId).update({'status': 'Coletado'});
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Coleta confirmada!')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao confirmar coleta')));
+    }
+  }
+
   // Função para converter a imagem de base64 para Image widget
   Image _convertBase64ToImage(String? base64Image) {
     if (base64Image != null && base64Image.isNotEmpty) {
@@ -115,15 +125,30 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
                               Text('Status: $status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                               SizedBox(height: 8),
                               Text('Endereço: $address', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                              ElevatedButton.icon(
-                                onPressed: () => _removerDescarte(docId),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                ),
-                                icon: Icon(Icons.delete, color: Colors.white),
-                                label: Text('Remover Descarte', style: TextStyle(fontSize: 16, color: Colors.white)),
+                              Column(
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () => _removerDescarte(docId),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: Icon(Icons.delete, color: Colors.white),
+                                    label: Text('Remover Descarte', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  ),
+                                  SizedBox(height: 8), // Espaçamento entre os botões
+                                  ElevatedButton.icon(
+                                    onPressed: () => _confirmarColeta(docId),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green, // Cor verde
+                                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: Icon(Icons.check, color: Colors.white),
+                                    label: Text('Confirmar Coleta', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

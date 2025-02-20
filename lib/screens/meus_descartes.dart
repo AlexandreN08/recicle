@@ -57,13 +57,19 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtém o UID do usuário autenticado
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Meus Descartes'),
         backgroundColor: Colors.green,
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('descartes').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('descartes')
+            .where('userId', isEqualTo: userId) // Filtra pelos descartes do usuário atual
+            .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

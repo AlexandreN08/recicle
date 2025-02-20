@@ -4,6 +4,7 @@ import 'package:recicle/screens/homescreen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:recicle/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:recicle/screens/reset_password_screen.dart';  // Importando a tela de recuperação de senha
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
+        '/resetpassword': (context) => ResetPasswordScreen(), // Adicionando a rota da tela de recuperação de senha
       },
     );
   }

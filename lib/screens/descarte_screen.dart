@@ -6,7 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;  // Pacote para redimensionar a imagem
+import 'package:image/image.dart' as img; // Pacote para redimensionar a imagem
+import 'package:firebase_messaging/firebase_messaging.dart'; // Adicionado para capturar o token FCM
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,9 @@ class _DescarteScreenState extends State<DescarteScreen> {
   File? selectedImage;
   DateTime? selectedDateTime;
   bool isLoading = false;
+  String? userToken; // Variável para armazenar o token FCM
+
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance; // Instância do Firebase Messaging
 
   final List<Map<String, dynamic>> materials = [
     {'title': 'Vidro', 'color': Colors.green, 'icon': Icons.wine_bar},
@@ -48,6 +52,29 @@ class _DescarteScreenState extends State<DescarteScreen> {
     {'title': 'Metal', 'color': Colors.yellow, 'icon': Icons.device_hub},
     {'title': 'Eletrônico', 'color': Colors.orange, 'icon': Icons.phone_iphone},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _getFCMToken(); // Captura o token FCM ao inicializar a tela
+  }
+
+  // Captura o token FCM do dispositivo
+  Future<void> _getFCMToken() async {
+    try {
+      String? token = await _firebaseMessaging.getToken();
+      if (token != null) {
+        setState(() {
+          userToken = token;
+        });
+        print("Token FCM capturado: $token");
+      } else {
+        print("Erro ao capturar o token FCM.");
+      }
+    } catch (e) {
+      print("Erro ao obter o token FCM: $e");
+    }
+  }
 
   Future<Position?> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -152,15 +179,20 @@ class _DescarteScreenState extends State<DescarteScreen> {
 
   // Função para redimensionar a imagem para reduzir seu tamanho
   Future<String> _compressImage(File image) async {
-    final img.Image? imageFile = img.decodeImage(image.readAsBytesSync());
-    if (imageFile == null) {
-      throw Exception('Falha ao decodificar a imagem.');
-    }
+    try {
+      final img.Image? imageFile = img.decodeImage(image.readAsBytesSync());
+      if (imageFile == null) {
+        throw Exception('Falha ao decodificar a imagem.');
+      }
 
-    final resizedImage = img.copyResize(imageFile, width: 800); // Reduz a largura para 800px
-    final compressedImage = File(image.path)..writeAsBytesSync(img.encodeJpg(resizedImage)); // Salva a imagem comprimida
-    final base64Image = base64Encode(compressedImage.readAsBytesSync());
-    return base64Image;
+      final resizedImage = img.copyResize(imageFile, width: 800); // Reduz a largura para 800px
+      final compressedImage = File(image.path)..writeAsBytesSync(img.encodeJpg(resizedImage)); // Salva a imagem comprimida
+      final base64Image = base64Encode(compressedImage.readAsBytesSync());
+      return base64Image;
+    } catch (e) {
+      print("Erro ao comprimir a imagem: $e");
+      throw Exception("Erro ao processar a imagem.");
+    }
   }
 
   Future<void> _saveToFirestore() async {
@@ -200,14 +232,15 @@ class _DescarteScreenState extends State<DescarteScreen> {
       final base64Image = await _compressImage(selectedImage!);
 
       await FirebaseFirestore.instance.collection('descartes').add({
-        'userId': user.uid,  // Adiciona o UID do usuário
+        'userId': user.uid, // Adiciona o UID do usuário
         'materials': selectedMaterials,
         'time': selectedDateTime!.toIso8601String(),
-        'imageBase64': base64Image,  // Armazena a imagem como Base64
+        'imageBase64': base64Image, // Armazena a imagem como Base64
         'location': {
           'latitude': position.latitude,
           'longitude': position.longitude,
         },
+        'userToken': userToken, // Armazena o token FCM do usuário
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -250,7 +283,7 @@ class _DescarteScreenState extends State<DescarteScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor, 
+                    color: Theme.of(context).primaryColor,
                   ),
                   textAlign: TextAlign.center,
                 ),

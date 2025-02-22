@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "reciclar-23c9f",
+  "private_key_id": "dcd0a2b18c9af1470a1712b9855c70a085b974cb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDUgmDlMwv9Tfuf\nU8PH0nEN4K5ORcrlbtgl7A2/mRHyC0IcDjFoVwcpRuXkoUC5B+ZiOrIAKY/OG2Qr\n9WuseoT6ZrycV74mf244GupZ9SrdG82dgJeURqZnGZI/dnIjeZ4+tHQEaPh0luYo\nCJdAf+6LA+A4CKgLE6/9G53vF1WwmEyvzhd3wSWZzqoULHKXNwZKmazbFRGm9wsv\n6H3py3kuKHKryxmKMx8fCdaabsTapOF/zxO0b/sT2wEsMU+N3547akQTxMAKzRsr\nLYVjXYcris8B832zUeTxblHPPICpVXmR/USdefb+GwK4HKUCeAybUYgrtruWf72+\nythB7av/AgMBAAECggEAB4Vrx4Dkgj0R1ERDMB3PGYYjtSp8MV2YcdMmc2sH+xCR\n8OtBrWczHi9fsJVSdJoGeeCI7z+JUuqeQ34Gpw6ZCUG8mC300Wj+LicptzBZqYSz\n5Mip1LohZpG9nthi1sWVp7N8TbGnZXz3vV/8dnBwsWPcOi94PxgdyPACyXUCd+MD\ngWBZ/Sa3FRiiwDFewTznvF1wVP8R4WvYGmS/3NItv5yqTYChmc/vIYcGhDnniT0l\nWXgFPoPYzYEiPaL3Xl8KzY6b6ZzyBRg+JaziQMkcFRO67i1QR5oJtv5ULzVktE+G\neqg20l9J6RHzEuPZbvNc/1dRPVtq2PN1Tc4vwGWcHQKBgQDzXL64ppQq1Pgmb7Js\ni5ECACIW5sY5Vbfe79l1Ddx5iD4KzVpe4Tx2yTJWONAeua8A7nwuZbroEYVYkMYx\nHGsYaBTRjV17YhOxjxs/CQOkN3KNmnSDtRNoil3mBfriCCBtxd5/MJdTFuqmIB2O\nWHPrhHN6ZITMEKGRWiqLMKxOBQKBgQDfi3lk8TcbkbaUU7qKMzKvONgU1IhcUbf3\n9uaOZbloMLa1G8Hk07o8rMuFinb/ZrF+fhQuzxx0XuK84pVVlxnH0KOzunU3FE3/\nR04MHWM6LeS2Z764HMf4ZfSkyZQvWwrokdMBZrFGNzi73AwTimr/oAVWDOAhQi2c\nVTsWNHptMwKBgGNZ0pbJkqWlyiTO5tV/aNSbP0+AKR6RCv6dhnZOEVsgLsv0J9ei\nNi/8VWtzyCsy/Onxcoryhwpk1L5iZDb6dhJBs3YVMzvCv212kdX7FRx+cmqyyqxW\nSTUdf9X/TPvn+201IW9lY/HM4kCtzcMmAzT8HrSxwrEYfQ089S9b0IwNAoGAFbX5\nE0muHXpYbi13l4aDbKsrqVI+8CBrqqSLHddZW3ontI0+lpfNpajul0isZ/+0S2G5\nWhZ5X//7K3ciI87qDRMBYyo/yhqpvJpTRS/xfCwK44BN8Jmy/jgAu6RsRPElrRLE\nmIU9wGEKnIwxjBBMdgk3m3Tiq7g+r8lDVNPB9CsCgYEAntDw21z4A2xq6Thv6DFH\nKYUe8FTDPfLeBQypwBEWsvQNX3Uy/sv93o0Yi0EmxkyC5GCMPLkSLyd19tNovxWj\nCCigW+9U3iseW7+R2Wb7VxxvBIn0zSQ5yZbkbKFtlZqo5dRDG7Z1ALifle83QrM0\nljgzY2elmSa8tSywVa0vzeg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "fcm-service-account@reciclar-23c9f.iam.gserviceaccount.com",
+  "client_id": "116402478789476849877",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fcm-service-account%40reciclar-23c9f.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

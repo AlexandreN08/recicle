@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:recicle/screens/descarte_screen.dart';  // Importe a tela de descarte
+import 'package:recicle/screens/locaisDescarte.dart';
 import 'package:recicle/screens/pontosColeta.dart';   // Importe a tela de pontos de coleta
 import 'package:recicle/screens/meus_descartes.dart'; // Importe a tela correta de Meus Descartes
 
@@ -107,7 +108,7 @@ class HomeScreen extends StatelessWidget {
               {'title': 'Pontos de Coleta', 'icon': Icons.location_on, 'screen': PontosColetaScreen()},
               {'title': 'Como Reciclar', 'icon': Icons.help_outline},
               {'title': 'Dicas', 'icon': Icons.lightbulb_outline},
-              {'title': 'Locais de Descarte', 'icon': Icons.delete_forever},
+              {'title': 'Locais de Descarte', 'icon': Icons.delete_forever, 'screen': LocaisDescarteScreen()},
               {'title': 'Horários', 'icon': Icons.access_time},
             ];
 

@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class LocaisDescarteScreen extends StatefulWidget {
   const LocaisDescarteScreen({super.key});
@@ -55,10 +57,18 @@ class _LocaisDescarteScreenState extends State<LocaisDescarteScreen> {
                       var empresa = empresas[index].data() as Map<String, dynamic>;
                       String nomeFantasia = empresa['nomeFantasia'] ?? 'Nome não disponível';
                       String enderecoCompleto = empresa['enderecoCompleto'] ?? 'Endereço não disponível';
+                      String logoBase64 = empresa['logoBase64'] ?? '';
 
                       return Card(
                         margin: EdgeInsets.all(8.0),
                         child: ListTile(
+                          leading: logoBase64.isNotEmpty
+                              ? CircleAvatar(
+                                  backgroundImage: MemoryImage(base64Decode(logoBase64)),
+                                )
+                              : CircleAvatar(
+                                  child: Icon(Icons.business),
+                                ),
                           title: Text(nomeFantasia),
                           subtitle: Text(enderecoCompleto),
                           trailing: IconButton(
@@ -110,6 +120,19 @@ class _CadastroEmpresaScreenState extends State<CadastroEmpresaScreen> {
   final _enderecoCompletoController = TextEditingController();
   final _cnpjController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  File? _imagemLogo;
+  final ImagePicker _picker = ImagePicker();
+
+  // Função para selecionar uma imagem
+  Future<void> _selecionarImagem() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imagemLogo = File(pickedFile.path);
+      });
+    }
+  }
 
   // Função para verificar se o CNPJ já está cadastrado
   Future<bool> _verificarCNPJ(String cnpj) async {
@@ -196,12 +219,20 @@ class _CadastroEmpresaScreenState extends State<CadastroEmpresaScreen> {
         return;
       }
 
+      // Converte a imagem para Base64
+      String logoBase64 = '';
+      if (_imagemLogo != null) {
+        final bytes = await _imagemLogo!.readAsBytes();
+        logoBase64 = base64Encode(bytes);
+      }
+
       // Cadastra a empresa no Firestore
       await _firestore.collection('empresas').add({
         'razaoSocial': razaoSocial,
         'nomeFantasia': nomeFantasia,
         'enderecoCompleto': enderecoCompleto,
         'cnpj': cnpj,
+        'logoBase64': logoBase64,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,6 +272,16 @@ class _CadastroEmpresaScreenState extends State<CadastroEmpresaScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  // Campo para carregar a imagem
+                  GestureDetector(
+                    onTap: _selecionarImagem,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _imagemLogo != null ? FileImage(_imagemLogo!) : null,
+                      child: _imagemLogo == null ? Icon(Icons.camera_alt, size: 40) : null,
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   TextFormField(
                     controller: _razaoSocialController,
                     decoration: InputDecoration(labelText: 'Razão Social'),

@@ -124,7 +124,7 @@ class LoginScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Color(0xFF4CAF50), // Fundo verde
           appBar: AppBar(
-            title: Text('LOGIN', style: TextStyle(color: Colors.white)),
+            title: Text('', style: TextStyle(color: Colors.white)),
             centerTitle: true,
             backgroundColor: Color(0xFF4CAF50),
           ),

@@ -33,33 +33,72 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Recuperar Senha'),
+        title: Text(
+          'Recuperar Senha',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.green,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Digite o seu e-mail para recuperar a senha',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'E-mail',
-                border: OutlineInputBorder(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(26.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Centraliza o conteúdo
+            children: [
+              SizedBox(height: 30), // Ajuste o tamanho conforme necessário
+              Text(
+                'Digite o seu e-mail para recuperar a senha',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _resetPassword(context),
-              child: Text('Enviar E-mail de Recuperação'),
-            ),
-          ],
+              SizedBox(height: 30), // Ajuste o espaçamento
+              // Campo de e-mail
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'E-mail',
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              SizedBox(height: 20),
+              // Botão de recuperação
+              ElevatedButton(
+                onPressed: () => _resetPassword(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                ),
+                child: Text(
+                  'Enviar E-mail de Recuperação',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(height: 20),
+              // Botão de voltar para login
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Volta para a tela de login
+                },
+                child: Text(
+                  'Voltar para login',
+                  style: TextStyle(color: Colors.green),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

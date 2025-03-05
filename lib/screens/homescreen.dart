@@ -4,6 +4,7 @@ import 'package:recicle/screens/comoReciclar.dart';
 import 'package:recicle/screens/descarte_screen.dart';  // Importe a tela de descarte
 import 'package:recicle/screens/dicas.dart';
 import 'package:recicle/screens/locaisDescarte.dart';
+import 'package:recicle/screens/meu_perfil.dart';
 import 'package:recicle/screens/pontosColeta.dart';   // Importe a tela de pontos de coleta
 import 'package:recicle/screens/meus_descartes.dart'; // Importe a tela correta de Meus Descartes
 
@@ -46,39 +47,22 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.green,
               ),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+              child: Center( // Centraliza o texto do menu
+                child: Text(
+                  'Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Tela Principal'),
-              onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-              },
             ),
             ListTile(
               leading: Icon(Icons.person),
               title: Text('Perfil'),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Configurações'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Sair'),
-              onTap: () {
-                _logout(context); // Faz o logoff
+                Navigator.pop(context); // Fecha o Drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MeuPerfilScreen()),
+                );
               },
             ),
             ListTile(
@@ -88,8 +72,35 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pop(context); // Fecha o Drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MeusDescartesScreen()), // Direcionando para a tela de Meus Descartes
+                  MaterialPageRoute(builder: (context) => MeusDescartesScreen()),
                 );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Ajuda'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o Drawer
+               //avigator.push(
+                 //ontext,
+                 //aterialPageRoute(builder: (context) => SettingsScreen()),
+               //;
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text('Sobre'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o Drawer
+                _logout(context); // Faz o logoff
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Sair'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o Drawer
+                _logout(context); // Faz o logoff
               },
             ),
           ],
@@ -111,7 +122,7 @@ class HomeScreen extends StatelessWidget {
               {'title': 'Como Reciclar', 'icon': Icons.help_outline, 'screen': ComoReciclarScreen()},
               {'title': 'Dicas', 'icon': Icons.lightbulb_outline, 'screen': DicasScreen()},
               {'title': 'Locais de Descarte', 'icon': Icons.delete_forever, 'screen': LocaisDescarteScreen()},
-              {'title': 'Horários', 'icon': Icons.access_time},
+              {'title': 'Horários', 'icon': Icons.access_time, 'screen': null}, // Nenhuma tela associada
             ];
 
             return GestureDetector(
@@ -151,30 +162,4 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Perfil')),
-      body: Center(
-        child: Text('Aqui estão os detalhes do perfil do usuário.'),
-      ),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Configurações')),
-      body: Center(
-        child: Text('Aqui estão as configurações do aplicativo.'),
-      ),
-    );
-  }
-}

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:recicle/screens/ajuda.dart';
 import 'package:recicle/screens/comoReciclar.dart';
 import 'package:recicle/screens/descarte_screen.dart';  // Importe a tela de descarte
 import 'package:recicle/screens/dicas.dart';
 import 'package:recicle/screens/locaisDescarte.dart';
 import 'package:recicle/screens/meu_perfil.dart';
 import 'package:recicle/screens/pontosColeta.dart';   // Importe a tela de pontos de coleta
-import 'package:recicle/screens/meus_descartes.dart'; // Importe a tela correta de Meus Descartes
+import 'package:recicle/screens/meus_descartes.dart';
+import 'package:recicle/screens/sobre.dart'; // Importe a tela correta de Meus Descartes
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,15 +31,8 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Tela Principal', style: TextStyle(color: Colors.white)),
+        centerTitle: true, 
         backgroundColor: Colors.green,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              // Ação ao clicar no ícone de notificações (você pode adicionar a lógica aqui)
-            },
-          ),
-        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -77,22 +72,25 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
+              leading: Icon(Icons.help_outline),
               title: Text('Ajuda'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-               //avigator.push(
-                 //ontext,
-                 //aterialPageRoute(builder: (context) => SettingsScreen()),
-               //;
+                Navigator.pop(context); 
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) => AjudaPage()),
+               );
               },
             ),
             ListTile(
               leading: Icon(Icons.info),
               title: Text('Sobre'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-                _logout(context); // Faz o logoff
+                Navigator.pop(context); 
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) => SobrePage()),
+               );
               },
             ),
             ListTile(

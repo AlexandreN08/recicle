@@ -3,7 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Importando Firestore
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  RegisterScreen({super.key});
+
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
@@ -11,8 +18,7 @@ class RegisterScreen extends StatelessWidget {
   final TextEditingController cpfController = TextEditingController(); // Controlador para CPF
   final TextEditingController addressController = TextEditingController(); // Controlador para endereço
   final TextEditingController phoneController = TextEditingController(); // Controlador para telefone
-
-  RegisterScreen({super.key});
+  bool _isPrivacyPolicyAccepted = false; // Controle da caixa de seleção
 
   // Função para validar CPF (com dígitos verificadores)
   bool _isCpfValid(String cpf) {
@@ -77,6 +83,14 @@ class RegisterScreen extends StatelessWidget {
     if (isCpfRegistered) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('CPF já cadastrado!')),
+      );
+      return;
+    }
+
+    // Verifica se o termo de política de privacidade foi aceito
+    if (!_isPrivacyPolicyAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Você precisa aceitar os termos de política de privacidade.')),
       );
       return;
     }
@@ -153,6 +167,8 @@ class RegisterScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
+
+              // Campos de cadastro (nome, email, cpf, senha, etc.)
 
               // Campo para nome completo
               TextField(
@@ -264,6 +280,28 @@ class RegisterScreen extends StatelessWidget {
                 keyboardType: TextInputType.phone,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
+              const SizedBox(height: 20),
+
+              // Caixa de seleção para termos de política de privacidade
+              Row(
+                children: [
+                  Checkbox(
+                    value: _isPrivacyPolicyAccepted,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isPrivacyPolicyAccepted = value!;
+                      });
+                    },
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Aceito os termos da Política de Privacidade',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 30),
 
               // Botão de cadastro
@@ -278,16 +316,18 @@ class RegisterScreen extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 20),
 
               // Botão de voltar para login
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Já tenho uma conta',
-                  style: TextStyle(color: Colors.green),
+              Padding(
+                padding: EdgeInsets.only(bottom: 16),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Já tenho uma conta',
+                    style: TextStyle(color: Colors.green),
+                  ),
                 ),
               ),
             ],

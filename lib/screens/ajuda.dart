@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AjudaPage extends StatefulWidget {
   @override
@@ -9,66 +9,104 @@ class AjudaPage extends StatefulWidget {
 class _AjudaPageState extends State<AjudaPage> {
   TextEditingController _textController = TextEditingController();
 
-  // Função para enviar o e-mail
-  void _sendEmail() async {
-    final Email email = Email(
-      body: _textController.text, // O conteúdo da dúvida do usuário
-      subject: 'Dúvida de Suporte',
-      recipients: ['alexandrenecher@gmail.com'], // E-mail de suporte
-      isHTML: false,
+  // Função para abrir o Gmail com o e-mail do suporte
+  Future<void> _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'alexandrenecher@gmail.com', // Substitua pelo e-mail de suporte
+      queryParameters: {
+        'subject': 'Dúvida de Suporte',
+        'body': _textController.text,
+      },
     );
 
-    try {
-      // Envia o e-mail
-      await FlutterEmailSender.send(email);
+    // Abre diretamente o aplicativo de e-mail
+    await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+  }
 
-      // Exibe mensagem de sucesso
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sua dúvida foi enviada com sucesso!')),
-      );
+  // Função para abrir o WhatsApp com o número de suporte
+  Future<void> _launchWhatsApp() async {
+    final String phoneNumber = '5546999185491'; // Substitua pelo número de suporte
+    final String message = 'Olá, tenho uma dúvida: ${_textController.text}';
 
-      // Limpa o campo de texto após envio
-      _textController.clear();
-    } catch (e) {
-      // Exibe mensagem de erro
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Falha ao enviar a dúvida. Erro: $e')),
-      );
-      print('Erro ao enviar e-mail: $e'); // Log do erro no console
-    }
+    final Uri whatsappUri = Uri.parse(
+      'https://wa.me/$phoneNumber?text=${Uri.encodeFull(message)}',
+    );
+
+    // Abre diretamente o WhatsApp
+    await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ajuda'),
-        backgroundColor: Colors.blue,
+        title: Text(
+          'Ajuda',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true, // Centraliza o título
+        backgroundColor: Colors.green, // Cor de fundo do AppBar
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: 66.0,
+          bottom: 80.0, // Adiciona padding na parte inferior
+        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Caso tenha alguma dúvida, escreva abaixo e envie para o suporte.',
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _textController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Escreva sua dúvida aqui...',
+              'Precisa de Ajuda?',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
               ),
             ),
+            SizedBox(height: 36),
+            Text(
+              'Caso tenha alguma dúvida ou precise de ajuda, escolha uma opção nos envie uma mensagem para o suporte.',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.justify,
+            ),
+            SizedBox(height: 40),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _sendEmail,
-              child: Text('Enviar'),
+              onPressed: _launchEmail,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.email, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text('Enviar E-mail', style: TextStyle(color: Colors.white)),
+                ],
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.green, // Cor do botão de e-mail
+                padding: EdgeInsets.symmetric(vertical: 15),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _launchWhatsApp,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/whatsapp.png', // Caminho da imagem do WhatsApp
+                    width: 24, // Largura da imagem
+                    height: 24, // Altura da imagem
+                  ),
+                  SizedBox(width: 10),
+                  Text('Enviar WhatsApp', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // Cor do botão do WhatsApp
+                padding: EdgeInsets.symmetric(vertical: 15),
               ),
             ),
           ],

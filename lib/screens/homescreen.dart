@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart'; // Importe o url_launcher
 import 'package:recicle/screens/ajuda.dart';
 import 'package:recicle/screens/comoReciclar.dart';
-import 'package:recicle/screens/descarte_screen.dart';  // Importe a tela de descarte
+import 'package:recicle/screens/descarte_screen.dart';
 import 'package:recicle/screens/dicas.dart';
 import 'package:recicle/screens/locaisDescarte.dart';
 import 'package:recicle/screens/meu_perfil.dart';
-import 'package:recicle/screens/pontosColeta.dart';   // Importe a tela de pontos de coleta
+import 'package:recicle/screens/pontosColeta.dart';
 import 'package:recicle/screens/meus_descartes.dart';
-import 'package:recicle/screens/sobre.dart'; // Importe a tela correta de Meus Descartes
+import 'package:recicle/screens/sobre.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,13 +26,29 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
+  // Função para abrir o site da prefeitura (testando com o Google)
+  Future<void> _launchPrefeituraSite(BuildContext context) async {
+    final Uri url = Uri.parse('https://pmp.pr.gov.br/website/views/horarioColetaLixo.php'); // Usando o Google para teste
+
+    try {
+      print('Tentando abrir o site: $url');
+      // Tenta abrir o link diretamente
+      await launchUrl(url, mode: LaunchMode.externalApplication); // Abre o Google no navegador
+    } catch (e) {
+      print('Erro ao abrir o site: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao abrir o site: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Tela Principal', style: TextStyle(color: Colors.white)),
-        centerTitle: true, 
+        centerTitle: true,
         backgroundColor: Colors.green,
       ),
       drawer: Drawer(
@@ -42,7 +59,7 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.green,
               ),
-              child: Center( // Centraliza o texto do menu
+              child: Center(
                 child: Text(
                   'Menu',
                   style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
@@ -75,22 +92,22 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.help_outline),
               title: Text('Ajuda'),
               onTap: () {
-                Navigator.pop(context); 
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(builder: (context) => AjudaPage()),
-               );
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AjudaPage()),
+                );
               },
             ),
             ListTile(
               leading: Icon(Icons.info),
               title: Text('Sobre'),
               onTap: () {
-                Navigator.pop(context); 
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(builder: (context) => SobrePage()),
-               );
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SobrePage()),
+                );
               },
             ),
             ListTile(
@@ -120,7 +137,7 @@ class HomeScreen extends StatelessWidget {
               {'title': 'Como Reciclar', 'icon': Icons.help_outline, 'screen': ComoReciclarScreen()},
               {'title': 'Dicas', 'icon': Icons.lightbulb_outline, 'screen': DicasScreen()},
               {'title': 'Locais de Descarte', 'icon': Icons.delete_forever, 'screen': LocaisDescarteScreen()},
-              {'title': 'Horários', 'icon': Icons.access_time, 'screen': null}, // Nenhuma tela associada
+              {'title': 'Horários Coleta Prefeitura', 'icon': Icons.access_time, 'screen': null}, // Nenhuma tela associada
             ];
 
             return GestureDetector(
@@ -131,6 +148,9 @@ class HomeScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (context) => cardsData[index]['screen']),
                   );
+                } else if (cardsData[index]['title'] == 'Horários Coleta Prefeitura') {
+                  // Abrir o site da prefeitura (agora testando com o Google)
+                  _launchPrefeituraSite(context); // Passa o context como parâmetro
                 }
               },
               child: Card(
@@ -159,5 +179,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-

@@ -77,7 +77,7 @@ class SobrePage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'O aplicativo está atualmente em fase de prototipação, com o objetivo de oferecer uma solução completa e acessível para a comunidade, promovendo a sustentabilidade e a conscientização ambiental.',
+              'O aplicativo foi desenvolvido com o objetivo de oferecer uma solução completa e acessível para a comunidade, promovendo a sustentabilidade e a conscientização ambiental.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),

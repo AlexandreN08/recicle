@@ -186,7 +186,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     ElevatedButton(
-                      onPressed: () => _loginWithGoogle(context),
+                      onPressed: () => _loginWithGoogle(context), // Botão de login com Google
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

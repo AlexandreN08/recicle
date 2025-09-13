@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:url_launcher/url_launcher.dart'; // Importe o url_launcher
+import 'package:url_launcher/url_launcher.dart'; 
 import 'package:recicle/screens/ajuda.dart';
 import 'package:recicle/screens/comoReciclar.dart';
 import 'package:recicle/screens/descarte_screen.dart';
@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  // Função para abrir o site da prefeitura (testando com o Google)
+  // Função para abrir o site da prefeitura 
   Future<void> _launchPrefeituraSite(BuildContext context) async {
     final Uri url = Uri.parse('https://pmp.pr.gov.br/website/views/horarioColetaLixo.php'); // Usando o Google para teste
 
@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.person),
               title: Text('Perfil'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
+                Navigator.pop(context); 
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MeuPerfilScreen()),
@@ -81,7 +81,7 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.view_list),
               title: Text('Meus Descartes'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
+                Navigator.pop(context); 
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MeusDescartesScreen()),
@@ -114,7 +114,7 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.exit_to_app),
               title: Text('Sair'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
+                Navigator.pop(context); 
                 _logout(context); // Faz o logoff
               },
             ),
@@ -125,11 +125,11 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 2 colunas
+            crossAxisCount: 2, 
             crossAxisSpacing: 16.0, // Espaço entre colunas
             mainAxisSpacing: 16.0, // Espaço entre linhas
           ),
-          itemCount: 6, // 6 cards
+          itemCount: 6, 
           itemBuilder: (context, index) {
             List<Map<String, dynamic>> cardsData = [
               {'title': 'Descartar Reciclável', 'icon': Icons.recycling, 'screen': DescarteScreen()},
@@ -149,7 +149,7 @@ class HomeScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => cardsData[index]['screen']),
                   );
                 } else if (cardsData[index]['title'] == 'Horários Coleta Prefeitura') {
-                  // Abrir o site da prefeitura (agora testando com o Google)
+                  
                   _launchPrefeituraSite(context); // Passa o context como parâmetro
                 }
               },

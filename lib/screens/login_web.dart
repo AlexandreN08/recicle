@@ -100,154 +100,153 @@ class LoginWebScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Color(0xFF4CAF50),
-      body: SingleChildScrollView(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            double containerWidth = constraints.maxWidth < 800
-                ? constraints.maxWidth * 0.9
-                : 600; // largura máxima desktop
-
-            return Center(
-              child: Container(
-                width: containerWidth,
-                padding: EdgeInsets.symmetric(
-                    horizontal: 20, vertical: screenHeight * 0.05),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/logo.png',
-                      height: screenHeight * 0.2,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            width: screenWidth > 600 ? 450 : screenWidth * 0.9,
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Logo
+                Image.asset(
+                  'assets/logo.png',
+                  height: 150,
+                ),
+                SizedBox(height: 24),
+                
+                // Título
+                Text(
+                  'RECYCLING',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                  ),
+                ),
+                SizedBox(height: 40),
+                
+                // Campo E-mail
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'E-mail',
+                    labelStyle: TextStyle(color: Colors.white),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.1),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.white, width: 2),
                     ),
-                    SizedBox(height: screenHeight * 0.03),
-                    Text(
-                      'RECYCLING',
-                      textAlign: TextAlign.center,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.white, width: 2),
+                    ),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 16),
+                
+                // Campo Senha
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Senha',
+                    labelStyle: TextStyle(color: Colors.white),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.1),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.white, width: 2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.white, width: 2),
+                    ),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                  obscureText: true,
+                ),
+                SizedBox(height: 32),
+                
+                // Botão LOGIN
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () => _login(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.green,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: Text(
+                      'LOGIN',
                       style: TextStyle(
-                        fontSize: screenWidth * 0.048,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        letterSpacing: 1.5,
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.03),
-                    TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(
-                        labelText: 'E-mail',
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    TextField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: screenHeight * 0.03),
-                    ElevatedButton(
-                      onPressed: () => _login(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        minimumSize: Size(double.infinity, screenHeight * 0.065),
+                  ),
+                ),
+                SizedBox(height: 32),
+                
+                // Links
+                Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegisterScreen()),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
                       ),
                       child: Text(
-                        'LOGIN',
+                        'Criar uma conta',
                         style: TextStyle(
-                            color: Colors.green,
-                            fontSize: screenWidth * 0.029,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.029),
-                    ElevatedButton(
-                      onPressed: () => _loginWithGoogle(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        minimumSize: Size(double.infinity, screenHeight * 0.025),
+                    SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ResetPasswordScreen()),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/google_logo.png',
-                            width: screenWidth * 0.065,
-                            height: screenWidth * 0.065,
-                          ),
-                          SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              'Login com Google',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: screenWidth * 0.025,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        'Esqueci minha senha',
+                        style: TextStyle(
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegisterScreen()),
-                            );
-                          },
-                          child: Text(
-                            'Criar uma conta',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenWidth * 0.025),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResetPasswordScreen()),
-                            );
-                          },
-                          child: Text(
-                            'Esqueci minha senha',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenWidth * 0.025),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         ),
       ),
     );

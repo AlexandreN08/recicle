@@ -4,62 +4,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:recicle/screens/homescreen.dart';
-import 'package:recicle/screens/home_web.dart'; // 🔹 Import da Home Web
+import 'package:recicle/screens/home_web.dart';
 import 'package:recicle/screens/login_screen.dart';
-import 'package:recicle/screens/login_web.dart'; // Tela específica para web
+import 'package:recicle/screens/login_web.dart';
 import 'package:recicle/screens/sobre.dart';
-import 'package:recicle/service/hash_generator.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialização do Firebase para todas as plataformas
+  // Inicialização do Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 🔹 Só executa no mobile/desktop, não no Web
-  if (!kIsWeb) {
-    await signInAndSaveHashOnce();
-  }
-
   runApp(MyApp());
-}
-
-Future<void> signInAndSaveHashOnce() async {
-  final auth = FirebaseAuth.instance;
-  User? user = auth.currentUser;
-
-  if (user == null) {
-    UserCredential cred = await auth.signInAnonymously();
-    user = cred.user;
-  }
-
-  if (user == null) {
-    print('Erro ao autenticar usuário.');
-    return;
-  }
-
-  final docRef =
-      FirebaseFirestore.instance.collection('registrations').doc(user.uid);
-  final docSnapshot = await docRef.get();
-
-  if (!docSnapshot.exists) {
-    String contentToHash =
-        "RecicleApp-${user.uid}-${DateTime.now().millisecondsSinceEpoch}";
-    String hash = generateHashFromContent(contentToHash);
-
-    await docRef.set({
-      'appName': 'Recicle App',
-      'appVersion': '1.0.0',
-      'hash': hash,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-    print('Registro salvo no Firestore.');
-  } else {
-    print('Registro já existe.');
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -67,30 +26,87 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Recicle App',
+      debugShowCheckedModeBanner: false, // Remove banner de debug
       theme: ThemeData(
         primarySwatch: Colors.green,
+        useMaterial3: true, // Material 3 design
       ),
-      home: kIsWeb ? AuthWrapperWeb() : LoginScreen(),
+      // Define a tela inicial baseada na plataforma
+      home: kIsWeb ? AuthWrapperWeb() : AuthWrapperMobile(),
       routes: {
         '/home': (context) => HomeScreen(),
         '/homeWeb': (context) => HomeWebScreen(),
         '/sobre': (context) => SobrePage(),
+        '/login': (context) => LoginScreen(),
+        '/loginWeb': (context) => LoginWebScreen(),
       },
     );
   }
 }
 
-/// 🔹 Verifica se usuário é admin no Firestore
+/// Wrapper de autenticação para Mobile
+class AuthWrapperMobile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Enquanto verifica autenticação
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.green),
+                  SizedBox(height: 16),
+                  Text(
+                    'Carregando...',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Se não há usuário logado, vai para login
+        if (!snapshot.hasData || snapshot.data == null) {
+          return LoginScreen();
+        }
+
+        // Usuário logado, vai para home
+        return HomeScreen();
+      },
+    );
+  }
+}
+
+/// Wrapper de autenticação para Web (com verificação de admin)
 class AuthWrapperWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Se ainda está carregando a autenticação
+        // Enquanto verifica autenticação
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.green),
+                  SizedBox(height: 16),
+                  Text(
+                    'Carregando...',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
           );
         }
 
@@ -100,7 +116,7 @@ class AuthWrapperWeb extends StatelessWidget {
         }
 
         final user = snapshot.data!;
-        
+
         // Verificar se é admin
         return FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance
@@ -111,13 +127,17 @@ class AuthWrapperWeb extends StatelessWidget {
           builder: (context, adminSnapshot) {
             if (adminSnapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(
+                backgroundColor: Colors.white,
                 body: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(),
+                      CircularProgressIndicator(color: Colors.green),
                       SizedBox(height: 16),
-                      Text('Verificando permissões...'),
+                      Text(
+                        'Verificando permissões...',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                      ),
                     ],
                   ),
                 ),
@@ -127,32 +147,33 @@ class AuthWrapperWeb extends StatelessWidget {
             // Se houve erro na consulta
             if (adminSnapshot.hasError) {
               print('Erro ao verificar admin: ${adminSnapshot.error}');
-              return HomeScreen(); // Direciona para tela normal em caso de erro
+              return HomeScreen();
             }
 
-            // Se não encontrou documentos ou está vazio
+            // Se não encontrou documentos
             if (!adminSnapshot.hasData || adminSnapshot.data!.docs.isEmpty) {
               print('Usuário ${user.email} não encontrado na coleção cadastros');
-              return HomeScreen(); // Usuário normal
+              return HomeScreen();
             }
 
             // Verificar se é admin
             try {
               final userData = adminSnapshot.data!.docs.first.data() as Map<String, dynamic>;
               final isAdmin = userData['isAdmin'] == true;
-              
-              print('Usuário: ${user.email}');
-              print('É admin: $isAdmin');
-              print('Dados do usuário: $userData');
+
+              print('👤 Usuário: ${user.email}');
+              print('🔑 É admin: $isAdmin');
 
               if (isAdmin) {
-                return HomeWebScreen(); // Admin vai para HomeWeb
+                print('Redirecionando para HomeWebScreen (Admin)');
+                return HomeWebScreen();
               } else {
-                return HomeScreen(); // Usuário normal vai para Home
+                print('Redirecionando para HomeScreen (Usuário)');
+                return HomeScreen();
               }
             } catch (e) {
               print('Erro ao processar dados do usuário: $e');
-              return HomeScreen(); // Em caso de erro, direciona para tela normal
+              return HomeScreen();
             }
           },
         );

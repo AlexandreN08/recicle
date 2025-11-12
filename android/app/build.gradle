@@ -8,24 +8,26 @@ plugins {
 
 android {
     namespace = "com.example.recicle"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.example.recicle"
-        minSdk = 23
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdkVersion = flutter.minSdkVersion
+        targetSdk = 35
+        versionCode = 1
+        versionName = 1.0
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -38,6 +40,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
 
 // O Google Services deve ser aplicado fora da seção `plugins` (compatibilidade com versões antigas).

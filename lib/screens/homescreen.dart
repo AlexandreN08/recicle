@@ -4,11 +4,12 @@ import 'package:recicle/screens/ajuda.dart';
 import 'package:recicle/screens/comoReciclar.dart';
 import 'package:recicle/screens/descarte_screen.dart';
 import 'package:recicle/screens/dicas.dart';
-import 'package:recicle/screens/locaisDescarte.dart';
 import 'package:recicle/screens/meu_perfil.dart';
 import 'package:recicle/screens/pontosColeta.dart';
 import 'package:recicle/screens/meus_descartes.dart';
 import 'package:recicle/screens/sobre.dart';
+import 'package:recicle/screens/locais_descarte_screen.dart';
+
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});

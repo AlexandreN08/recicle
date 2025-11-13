@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.example.recicle"
     compileSdk = 35
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.recicle"
-        minSdkVersion = flutter.minSdkVersion
+        minSdkVersion = 23
         targetSdk = 35
         versionCode = 1
         versionName = 1.0

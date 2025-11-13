@@ -10,7 +10,7 @@ class HomeController {
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao sair: $e')),
+        SnackBar(content: Text('Erro ao sair: $e')), 
       );
     }
   }

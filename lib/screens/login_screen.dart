@@ -38,14 +38,11 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Logo
                     Image.asset(
                       'assets/logo.png',
                       height: 150,
                     ),
                     const SizedBox(height: 20),
-
-                    // Título
                     const Text(
                       'RECYCLING',
                       style: TextStyle(
@@ -55,8 +52,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Campo E-mail
                     TextField(
                       controller: emailController,
                       decoration: const InputDecoration(
@@ -73,8 +68,6 @@ class LoginScreen extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 10),
-
-                    // Campo Senha
                     TextField(
                       controller: passwordController,
                       decoration: const InputDecoration(
@@ -92,7 +85,6 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Botão de Login
                     ElevatedButton(
                       onPressed: () => _authController.loginWithEmail(
                         context: context,
@@ -120,7 +112,6 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     const SizedBox(height: 20),
 
-                    // Links de cadastro e senha
                     TextButton(
                       onPressed: () {
                         Navigator.push(

@@ -42,39 +42,6 @@ class AuthController {
     }
   }
 
-  /// Faz login com o Google
-  Future<void> loginWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login com Google cancelado.')),
-        );
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await _auth.signInWithCredential(credential);
-      await _getCurrentLocation();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login com Google realizado com sucesso!')),
-      );
-
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao fazer login com Google.')),
-      );
-    }
-  }
-
   /// Obtém a localização atual do usuário
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../controllers/pontos_coleta_controller.dart';
 import '../models/ponto_coleta_model.dart';
 
@@ -19,6 +20,30 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
     _controller.requestLocationPermission(context);
   }
 
+
+  DateTime? parseTime(String? time) {
+    if (time == null || time.isEmpty) return null;
+    try {
+      if (time.contains('-')) {
+        return DateTime.parse(time);
+      } else if (time.contains(':')) {
+        final parts = time.split(':');
+        return DateTime(0, 1, 1, int.parse(parts[0]), int.parse(parts[1]));
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Formata DateTime para padrão brasileiro
+  String formatDateTime(DateTime? dt) {
+    if (dt == null) return 'Horário não definido';
+    final formatter = DateFormat('dd/MM/yyyy – HH:mm');
+    return formatter.format(dt);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +60,7 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
           if (snapshot.hasError) {
             return const Center(child: Text('Erro ao carregar os dados'));
           }
+
           final pontos = snapshot.data ?? [];
           if (pontos.isEmpty) {
             return const Center(child: Text('Nenhum ponto de coleta encontrado.'));
@@ -44,39 +70,52 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
             itemCount: pontos.length,
             itemBuilder: (context, index) {
               final ponto = pontos[index];
+
               return FutureBuilder<String>(
                 future: (ponto.latitude != null && ponto.longitude != null)
                     ? _controller.getAddressFromLatLng(ponto.latitude!, ponto.longitude!)
                     : Future.value("Endereço não disponível"),
                 builder: (context, addressSnapshot) {
                   final address = addressSnapshot.data ?? "Carregando endereço...";
+
+                  final timeDt = parseTime(ponto.time);
+
                   return Card(
                     margin: const EdgeInsets.all(10),
                     elevation: 5,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                          child: _controller.convertBase64ToImage(ponto.imageBase64),
-                        ),
+                        if (ponto.imageBase64 != null)
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            child: _controller.convertBase64ToImage(ponto.imageBase64!),
+                          ),
                         Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Materiais: ${ponto.materials.join(', ')}',
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 8),
-                              Text('Horário disponível: ${ponto.time ?? 'Sem horário'}',
-                                  style: const TextStyle(fontSize: 16)),
-                              const SizedBox(height: 8),
-                              Text('Endereço: $address',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text(
+                                'Materiais: ${ponto.materials.join(', ')}',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
                               const SizedBox(height: 8),
                               Text(
-                                'Criado em: ${ponto.createdAt != null ? '${ponto.createdAt!.day}/${ponto.createdAt!.month}/${ponto.createdAt!.year} às ${ponto.createdAt!.hour}:${ponto.createdAt!.minute}' : 'Data não disponível'}',
+                                'Horário disponível: ${formatDateTime(timeDt)}',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Endereço: $address',
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Criado em: ${formatDateTime(ponto.createdAt)}',
                                 style: const TextStyle(fontSize: 14, color: Colors.grey),
                               ),
                               const SizedBox(height: 12),

@@ -10,11 +10,19 @@ import 'package:recicle/screens/meus_descartes.dart';
 import 'package:recicle/screens/sobre.dart';
 import 'package:recicle/screens/locais_descarte_screen.dart';
 
-
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final HomeController _controller = HomeController();
+
+  final List<Color> cardColors = [
+    Colors.green,    // 1 - Verde
+    Colors.blue,     // 2 - Azul
+    Colors.red,      // 3 - Vermelho
+    Colors.yellow,   // 4 - Amarelo
+    Colors.orange,   // 5 - Laranja
+    Colors.brown,    // 6 - Marrom
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +120,7 @@ class HomeScreen extends StatelessWidget {
                 }
               },
               child: Card(
-                color: Colors.green,
+                color: cardColors[index],
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

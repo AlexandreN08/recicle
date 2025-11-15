@@ -39,48 +39,57 @@ class RecentDisposals extends StatelessWidget {
                     final createdAt = data['createdAt'] as Timestamp?;
                     final location = data['location'] as Map<String, dynamic>?;
 
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: ListTile(
-                        leading: const CircleAvatar(
-                          backgroundColor: Colors.green,
-                          child: Icon(Icons.delete, color: Colors.white),
-                        ),
-                        title: Text(
-                          'Materiais: ${materials.join(", ")}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (createdAt != null)
-                              Text('Data: ${_formatDate(createdAt.toDate())}'),
-                            if (location != null)
-                              Text(
-                                  'Localização: ${location['latitude']?.toStringAsFixed(4)}, ${location['longitude']?.toStringAsFixed(4)}'),
-                          ],
-                        ),
-                        trailing: PopupMenuButton(
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'details',
-                              child: Text('Ver Detalhes'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Excluir'),
-                            ),
-                          ],
-                          onSelected: (value) {
-                            if (value == 'delete') {
-                              _deleteDisposal(context, doc.id);
-                            } else if (value == 'details') {
-                              _showDisposalDetails(context, data);
-                            }
-                          },
-                        ),
+                    return FutureBuilder<String>(
+                      future: controller.getAddressFromLatLng(
+                        location?['latitude'],
+                        location?['longitude'],
                       ),
+                      builder: (context, addressSnapshot) {
+                        final address =
+                            addressSnapshot.data ?? 'Carregando endereço...';
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Colors.green,
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                            title: Text(
+                              'Materiais: ${materials.join(", ")}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (createdAt != null)
+                                  Text('Data: ${_formatDate(createdAt.toDate())}'),
+                                Text('Endereço: $address'),
+                              ],
+                            ),
+                            trailing: PopupMenuButton(
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'details',
+                                  child: Text('Ver Detalhes'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Excluir'),
+                                ),
+                              ],
+                              onSelected: (value) {
+                                if (value == 'delete') {
+                                  _deleteDisposal(context, doc.id);
+                                } else if (value == 'details') {
+                                  _showDisposalDetails(context, data, address);
+                                }
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     );
                   }).toList(),
                 );
@@ -93,7 +102,10 @@ class RecentDisposals extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year} ${date.hour.toString().padLeft(2, '0')}:'
+        '${date.minute.toString().padLeft(2, '0')}';
   }
 
   void _deleteDisposal(BuildContext context, String docId) {
@@ -123,7 +135,8 @@ class RecentDisposals extends StatelessWidget {
     );
   }
 
-  void _showDisposalDetails(BuildContext context, Map<String, dynamic> data) {
+  void _showDisposalDetails(
+      BuildContext context, Map<String, dynamic> data, String address) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -138,9 +151,7 @@ class RecentDisposals extends StatelessWidget {
               const SizedBox(height: 8),
               Text('Usuário ID: ${data['userId'] ?? "N/A"}'),
               const SizedBox(height: 8),
-              if (data['location'] != null)
-                Text(
-                    'Localização: ${data['location']['latitude']}, ${data['location']['longitude']}'),
+              Text('Endereço: $address'),
               const SizedBox(height: 8),
               if (data['createdAt'] != null)
                 Text(

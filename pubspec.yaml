@@ -50,6 +50,8 @@ dependencies:
   flutter_email_sender: ^7.0.0
   cloud_functions: ^5.3.4
   crypto: ^3.0.6
+  flutter_localizations:
+    sdk: flutter
 
 
 dev_dependencies:

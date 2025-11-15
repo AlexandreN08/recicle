@@ -49,12 +49,15 @@ class _DescarteScreenState extends State<DescarteScreen> {
     if (hora == null) return;
 
     setState(() {
-      _dataHora = DateTime(data.year, data.month, data.day, hora.hour, hora.minute);
+      _dataHora =
+          DateTime(data.year, data.month, data.day, hora.hour, hora.minute);
     });
   }
 
   Future<void> _salvar() async {
-    if (_materiaisSelecionados.isEmpty || _imagemSelecionada == null || _dataHora == null) {
+    if (_materiaisSelecionados.isEmpty ||
+        _imagemSelecionada == null ||
+        _dataHora == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Preencha todos os campos.')),
       );
@@ -79,22 +82,35 @@ class _DescarteScreenState extends State<DescarteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Descartar Reciclável'), backgroundColor: Colors.green),
+      appBar: AppBar(
+          title: const Text('Descartar Reciclável'),
+          backgroundColor: Colors.green),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Selecione os materiais:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              // ----------- TÍTULO MATERIAIS -----------
+              const Text(
+                'Selecione os materiais:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 10),
+
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, crossAxisSpacing: 16, mainAxisSpacing: 16),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16),
                 itemCount: _materiais.length,
                 itemBuilder: (_, i) {
                   final m = _materiais[i];
-                  final selecionado = _materiaisSelecionados.contains(m['title']);
+                  final selecionado =
+                      _materiaisSelecionados.contains(m['title']);
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -104,14 +120,22 @@ class _DescarteScreenState extends State<DescarteScreen> {
                       });
                     },
                     child: Card(
-                      color: selecionado ? m['color'].withOpacity(0.6) : m['color'],
+                      color: selecionado
+                          ? m['color'].withOpacity(0.6)
+                          : m['color'],
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(m['icon'], color: Colors.white, size: 40),
                             const SizedBox(height: 8),
-                            Text(m['title'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                            Text(
+                              m['title'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -119,34 +143,80 @@ class _DescarteScreenState extends State<DescarteScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 20),
+
+              // ----------- TÍTULO IMAGEM -----------
+              Text(
+                'Carregue uma imagem dos materiais a serem descartados:',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 10),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(onPressed: () => _selecionarImagem(camera: true), child: const Text('Tirar Foto')),
-                  ElevatedButton(onPressed: _selecionarImagem, child: const Text('Selecionar Foto')),
+                  ElevatedButton(
+                    onPressed: () => _selecionarImagem(camera: true),
+                    child: const Text('Tirar Foto'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _selecionarImagem,
+                    child: const Text('Selecionar Foto'),
+                  ),
                 ],
               ),
+
               const SizedBox(height: 16),
+
               _imagemSelecionada != null
                   ? Image.file(_imagemSelecionada!, width: 200, height: 200)
                   : const Text('Nenhuma imagem selecionada'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _selecionarDataHora,
-                child: Text(
-                  _dataHora != null
-                      ? 'Selecionado: ${_dataHora!.toLocal()}'
-                      : 'Escolher Data e Hora',
+
+              const SizedBox(height: 20),
+
+              // ----------- TÍTULO HORÁRIO -----------
+              Text(
+                'Selecione um Horario disponível para coleta:',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 10),
+
+              Center(
+                child: ElevatedButton(
+                  onPressed: _selecionarDataHora,
+                  child: Text(
+                    _dataHora != null
+                        ? 'Selecionado: ${_dataHora!.toLocal()}'
+                        : 'Escolher Data e Hora',
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 20),
+
               _loading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _salvar,
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                      child: const Text('Salvar'),
+                  ? const Center(child: CircularProgressIndicator())
+                  : Center(
+                      child: ElevatedButton(
+                        onPressed: _salvar,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 12),
+                        ),
+                        child: const Text('Salvar'),
+                      ),
                     ),
             ],
           ),

@@ -15,7 +15,7 @@ class DicasScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      body: SafeArea( // Envolvendo o corpo com SafeArea
+      body: SafeArea( 
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -31,7 +31,7 @@ class DicasScreen extends StatelessWidget {
                 ),
                 children: [
                   Image.asset(
-                    'assets/nao_plastico.png', // Caminho da imagem
+                    'assets/nao_plastico.png', 
                     height: 300,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -66,7 +66,7 @@ class DicasScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Image.asset(
-                          'assets/dica.jpg', // Caminho da imagem
+                          'assets/dica.jpg', 
                           height: 300,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -91,7 +91,7 @@ class DicasScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Image.asset(
-                          'assets/tampinha.jpg', // Caminho da imagem
+                          'assets/tampinha.jpg', 
                           height: 300,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -116,7 +116,7 @@ class DicasScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Image.asset(
-                          'assets/vasoBoneca.jpg', // Caminho da imagem
+                          'assets/vasoBoneca.jpg', 
                           height: 300,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -141,7 +141,7 @@ class DicasScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Image.asset(
-                          'assets/guarrafa.jpg', // Caminho da imagem
+                          'assets/guarrafa.jpg', 
                           height: 300,
                           width: double.infinity,
                           fit: BoxFit.cover,

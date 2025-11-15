@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // Para kIsWeb
+import 'package:flutter/foundation.dart'; 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,12 +26,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Recicle App',
-      debugShowCheckedModeBanner: false, // Remove banner de debug
+      debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         primarySwatch: Colors.green,
-        useMaterial3: true, // Material 3 design
+        useMaterial3: true, 
       ),
-      // Define a tela inicial baseada na plataforma
       home: kIsWeb ? AuthWrapperWeb() : AuthWrapperMobile(),
       routes: {
         '/home': (context) => HomeScreen(),
@@ -43,8 +42,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-/// Wrapper de autenticação para Mobile
 class AuthWrapperMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -71,26 +68,22 @@ class AuthWrapperMobile extends StatelessWidget {
           );
         }
 
-        // Se não há usuário logado, vai para login
         if (!snapshot.hasData || snapshot.data == null) {
           return LoginScreen();
         }
 
-        // Usuário logado, vai para home
         return HomeScreen();
       },
     );
   }
 }
 
-/// Wrapper de autenticação para Web (com verificação de admin)
 class AuthWrapperWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Enquanto verifica autenticação
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: Colors.white,
@@ -110,14 +103,12 @@ class AuthWrapperWeb extends StatelessWidget {
           );
         }
 
-        // Se não há usuário logado
         if (!snapshot.hasData || snapshot.data == null) {
           return LoginWebScreen();
         }
 
         final user = snapshot.data!;
 
-        // Verificar se é admin
         return FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance
               .collection('cadastros')
@@ -144,19 +135,16 @@ class AuthWrapperWeb extends StatelessWidget {
               );
             }
 
-            // Se houve erro na consulta
             if (adminSnapshot.hasError) {
               print('Erro ao verificar admin: ${adminSnapshot.error}');
               return HomeScreen();
             }
 
-            // Se não encontrou documentos
             if (!adminSnapshot.hasData || adminSnapshot.data!.docs.isEmpty) {
               print('Usuário ${user.email} não encontrado na coleção cadastros');
               return HomeScreen();
             }
 
-            // Verificar se é admin
             try {
               final userData = adminSnapshot.data!.docs.first.data() as Map<String, dynamic>;
               final isAdmin = userData['isAdmin'] == true;

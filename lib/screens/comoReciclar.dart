@@ -29,7 +29,7 @@ class ComoReciclarScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Image.asset(
-  'assets/lixeiras.jpeg', // Caminho da imagem
+  'assets/lixeiras.jpeg', 
   height: 150,
   width: double.infinity,
   fit: BoxFit.cover,
@@ -51,7 +51,7 @@ class ComoReciclarScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
 Image.asset(
-  'assets/material.jpg', // Caminho da imagem
+  'assets/material.jpg', 
   height: 150,
   width: double.infinity,
   fit: BoxFit.cover,

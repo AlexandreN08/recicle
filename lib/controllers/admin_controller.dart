@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geocoding/geocoding.dart';
 
 class AdminController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // ============ USUÁRIOS ============
-  
+  // ================= USUÁRIOS =================
   Stream<QuerySnapshot> getUsersStream() {
     return _firestore
         .collection('cadastros')
@@ -61,8 +61,7 @@ class AdminController {
     await _firestore.collection('cadastros').doc(docId).delete();
   }
 
-  // ============ DESCARTES ============
-  
+  // ================= DESCARTES =================
   Stream<QuerySnapshot> getDisposalsStream({int? limit}) {
     Query query = _firestore
         .collection('descartes')
@@ -79,8 +78,7 @@ class AdminController {
     await _firestore.collection('descartes').doc(docId).delete();
   }
 
-  // ============ ESTATÍSTICAS ============
-  
+  // ================= ESTATÍSTICAS =================
   Stream<QuerySnapshot> getCollectionStream(String collection) {
     return _firestore.collection(collection).snapshots();
   }
@@ -115,13 +113,34 @@ class AdminController {
     return total;
   }
 
-  // ============ AUTENTICAÇÃO ============
-  
+  // ================= AUTENTICAÇÃO =================
   User? getCurrentUser() {
     return _auth.currentUser;
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  // ================= GEOCODING REVERSO =================
+  Future<String> getAddressFromLatLng(dynamic lat, dynamic lng) async {
+    try {
+      if (lat == null || lng == null) return 'Endereço não disponível';
+
+      // Garantir que sejam double
+      final latitude = lat is double ? lat : double.tryParse(lat.toString());
+      final longitude = lng is double ? lng : double.tryParse(lng.toString());
+
+      if (latitude == null || longitude == null) return 'Endereço não disponível';
+
+      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isEmpty) return 'Endereço não disponível';
+
+      final place = placemarks.first;
+      return '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}';
+    } catch (e) {
+      print('Erro ao converter coordenadas em endereço: $e');
+      return 'Endereço não disponível';
+    }
   }
 }

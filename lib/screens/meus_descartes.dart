@@ -43,10 +43,10 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
     super.initState();
     _initializeNotifications();
     _listenToFirestoreChanges();
-    _saveFCMToken(); // Salva o token FCM do usuário atual
+    _saveFCMToken(); 
   }
 
-  // Inicializa as notificações e solicita permissão
+ 
   Future<void> _initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
     const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
@@ -147,7 +147,6 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
           'dataColeta': FieldValue.serverTimestamp(),
         });
 
-        // Envia a notificação para o userToken
         if (userToken.isNotEmpty) {
           print("Enviando notificação para o token: $userToken");
           sendPushNotification(userToken);
@@ -185,7 +184,6 @@ class _MeusDescartesScreenState extends State<MeusDescartesScreen> {
     }
   }
 
-  // Escuta mudanças no Firestore e envia notificações
   void _listenToFirestoreChanges() {
     FirebaseFirestore.instance
         .collection('descartes')

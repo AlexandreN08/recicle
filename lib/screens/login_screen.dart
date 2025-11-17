@@ -17,17 +17,17 @@ class LoginScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF4CAF50),
+            backgroundColor: Colors.green,
             body: Center(child: CircularProgressIndicator(color: Colors.white)),
           );
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: Colors.green,
           appBar: AppBar(
             title: const Text('', style: TextStyle(color: Colors.white)),
             centerTitle: true,
-            backgroundColor: const Color(0xFF4CAF50),
+            backgroundColor: Colors.green,
             elevation: 0,
           ),
           body: SingleChildScrollView(
@@ -69,20 +69,25 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     TextField(
-                      controller: passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Senha',
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      obscureText: true,
+                     controller: passwordController,
+                     obscureText: true,
+                     obscuringCharacter: '•', 
+                     enableSuggestions: false,
+                     autocorrect: false,
+                     keyboardType: TextInputType.visiblePassword,
+                     decoration: const InputDecoration(
+                      labelText: 'Senha',
+                      labelStyle: TextStyle(color: Colors.white),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
                     ),
+                     focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                    ),
+                    ),
+                       style: const TextStyle(color: Colors.white),
+                    ),
+
                     const SizedBox(height: 20),
 
                     ElevatedButton(

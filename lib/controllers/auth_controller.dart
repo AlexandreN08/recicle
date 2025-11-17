@@ -7,7 +7,6 @@ class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  /// Faz login com e-mail e senha
   Future<void> loginWithEmail({
     required BuildContext context,
     required String email,
@@ -42,7 +41,6 @@ class AuthController {
     }
   }
 
-  /// Obtém a localização atual do usuário
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;

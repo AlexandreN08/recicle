@@ -5,7 +5,6 @@ class MeuPerfilController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Carrega os dados do usuário do Firestore
   Future<Map<String, dynamic>?> loadUserData() async {
     final user = _auth.currentUser;
     if (user == null) return null;

@@ -11,8 +11,10 @@ class PontosColetaController {
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initNotifications() async {
-    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('app_icon');
-    const InitializationSettings settings = InitializationSettings(android: androidSettings);
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('app_icon');
+    const InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
     await _notificationsPlugin.initialize(settings);
   }
 
@@ -36,23 +38,27 @@ class PontosColetaController {
         );
       } catch (_) {}
     }
-    return Image.asset('assets/placeholder.png', fit: BoxFit.cover, height: 200, width: double.infinity);
+    return Image.asset('assets/placeholder.png',
+        fit: BoxFit.cover, height: 200, width: double.infinity);
   }
 
   Future<String> getAddressFromLatLng(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         Placemark p = placemarks.first;
-        return "${p.name}, ${p.thoroughfare}, ${p.subLocality}, ${p.locality} - ${p.administrativeArea}";
+        return "${p.thoroughfare}, ${p.subLocality}, ${p.locality}";
       }
     } catch (_) {}
     return "Endereço não disponível";
   }
 
-  Future<void> openGoogleMaps(double latitude, double longitude, BuildContext context) async {
+  Future<void> openGoogleMaps(
+      double latitude, double longitude, BuildContext context) async {
     String googleMapsUrl = "google.navigation:q=$latitude,$longitude";
-    String googleMapsWebUrl = "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
+    String googleMapsWebUrl =
+        "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
 
     if (await canLaunch(googleMapsUrl)) {
       await launch(googleMapsUrl);
@@ -66,7 +72,8 @@ class PontosColetaController {
   }
 
   Future<void> sendNotification(String title, String body) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       'channel_id',
       'channel_name',
       channelDescription: 'Canal de notificações',
@@ -83,13 +90,27 @@ class PontosColetaController {
       'coletadoPor': userId,
       'dataColeta': FieldValue.serverTimestamp(),
     });
-    await sendNotification('Coleta Confirmada!', 'O ponto de coleta foi confirmado e está pronto para ser coletado.');
+
+    await sendNotification(
+      'Coleta Confirmada!',
+      'O ponto de coleta foi confirmado e removido da lista de pendentes.',
+    );
   }
 
-  Stream<List<PontoColeta>> getPontosColeta() {
-    return FirebaseFirestore.instance
-        .collection('descartes')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => PontoColeta.fromFirestore(doc)).toList());
-  }
+Stream<List<PontoColeta>> getPontosColeta() {
+  return FirebaseFirestore.instance
+      .collection('descartes')
+      .snapshots()
+      .map((snapshot) {
+        return snapshot.docs
+            .where((doc) {
+              final data = doc.data();
+              final status = data['status'];
+
+              return status == null || status == 'pendente';
+            })
+            .map((doc) => PontoColeta.fromFirestore(doc))
+            .toList();
+      });
+}
 }

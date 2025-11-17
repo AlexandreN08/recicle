@@ -21,6 +21,7 @@ class RecentDisposals extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
+
             StreamBuilder<QuerySnapshot>(
               stream: controller.getDisposalsStream(limit: 10),
               builder: (context, snapshot) {
@@ -35,39 +36,52 @@ class RecentDisposals extends StatelessWidget {
                 return Column(
                   children: snapshot.data!.docs.map((doc) {
                     final data = doc.data() as Map<String, dynamic>;
+
                     final materials = data['materials'] as List<dynamic>? ?? [];
-                    final createdAt = data['createdAt'] as Timestamp?;
-                    final location = data['location'] as Map<String, dynamic>?;
+
+                    final timeString = data['time'] as String?;
+                    final createdAt = timeString != null
+                        ? DateTime.tryParse(timeString)
+                        : null;
+
+                    final location =
+                        data['location'] as Map<String, dynamic>?;
+
+                    final lat =
+                        (location?['latitude'] as num?)?.toDouble();
+                    final lng =
+                        (location?['longitude'] as num?)?.toDouble();
 
                     return FutureBuilder<String>(
-                      future: controller.getAddressFromLatLng(
-                        location?['latitude'],
-                        location?['longitude'],
-                      ),
+                      future: controller.getAddressFromLatLng(lat, lng),
                       builder: (context, addressSnapshot) {
-                        final address =
-                            addressSnapshot.data ?? 'Carregando endereço...';
+                        final address = addressSnapshot.data ??
+                            'Carregando endereço...';
 
                         return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          margin: const EdgeInsets.symmetric(vertical: 6),
                           child: ListTile(
                             leading: const CircleAvatar(
                               backgroundColor: Colors.green,
                               child: Icon(Icons.delete, color: Colors.white),
                             ),
+
                             title: Text(
                               'Materiais: ${materials.join(", ")}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (createdAt != null)
-                                  Text('Data: ${_formatDate(createdAt.toDate())}'),
+                                  Text(
+                                      'Data: ${_formatDate(createdAt)}'),
                                 Text('Endereço: $address'),
                               ],
                             ),
+
                             trailing: PopupMenuButton(
                               itemBuilder: (context) => [
                                 const PopupMenuItem(
@@ -83,7 +97,8 @@ class RecentDisposals extends StatelessWidget {
                                 if (value == 'delete') {
                                   _deleteDisposal(context, doc.id);
                                 } else if (value == 'details') {
-                                  _showDisposalDetails(context, data, address);
+                                  _showDisposalDetails(
+                                      context, data, address, createdAt);
                                 }
                               },
                             ),
@@ -104,7 +119,8 @@ class RecentDisposals extends StatelessWidget {
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year} ${date.hour.toString().padLeft(2, '0')}:'
+        '${date.year} '
+        '${date.hour.toString().padLeft(2, '0')}:'
         '${date.minute.toString().padLeft(2, '0')}';
   }
 
@@ -136,7 +152,11 @@ class RecentDisposals extends StatelessWidget {
   }
 
   void _showDisposalDetails(
-      BuildContext context, Map<String, dynamic> data, String address) {
+      BuildContext context,
+      Map<String, dynamic> data,
+      String address,
+      DateTime? createdAt,
+      ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -147,15 +167,14 @@ class RecentDisposals extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                  'Materiais: ${(data['materials'] as List<dynamic>?)?.join(", ") ?? "N/A"}'),
+                  'Materiais: ${(data["materials"] as List<dynamic>).join(", ")}'),
               const SizedBox(height: 8),
-              Text('Usuário ID: ${data['userId'] ?? "N/A"}'),
+              Text('Usuário ID: ${data["userId"] ?? "N/A"}'),
               const SizedBox(height: 8),
               Text('Endereço: $address'),
               const SizedBox(height: 8),
-              if (data['createdAt'] != null)
-                Text(
-                    'Data: ${_formatDate((data['createdAt'] as Timestamp).toDate())}'),
+              if (createdAt != null)
+                Text('Data: ${_formatDate(createdAt)}'),
             ],
           ),
         ),

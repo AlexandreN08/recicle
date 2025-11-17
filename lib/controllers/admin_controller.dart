@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geocoding/geocoding.dart';
@@ -6,7 +8,6 @@ class AdminController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // ================= USUÁRIOS =================
   Stream<QuerySnapshot> getUsersStream() {
     return _firestore
         .collection('cadastros')
@@ -61,7 +62,6 @@ class AdminController {
     await _firestore.collection('cadastros').doc(docId).delete();
   }
 
-  // ================= DESCARTES =================
   Stream<QuerySnapshot> getDisposalsStream({int? limit}) {
     Query query = _firestore
         .collection('descartes')
@@ -78,7 +78,6 @@ class AdminController {
     await _firestore.collection('descartes').doc(docId).delete();
   }
 
-  // ================= ESTATÍSTICAS =================
   Stream<QuerySnapshot> getCollectionStream(String collection) {
     return _firestore.collection(collection).snapshots();
   }
@@ -113,7 +112,6 @@ class AdminController {
     return total;
   }
 
-  // ================= AUTENTICAÇÃO =================
   User? getCurrentUser() {
     return _auth.currentUser;
   }
@@ -122,25 +120,44 @@ class AdminController {
     await _auth.signOut();
   }
 
-  // ================= GEOCODING REVERSO =================
-  Future<String> getAddressFromLatLng(dynamic lat, dynamic lng) async {
-    try {
-      if (lat == null || lng == null) return 'Endereço não disponível';
+ Future<String> getAddressFromLatLng(dynamic lat, dynamic lng) async {
+  try {
+    if (lat == null || lng == null) return 'Endereço não disponível';
 
-      // Garantir que sejam double
-      final latitude = lat is double ? lat : double.tryParse(lat.toString());
-      final longitude = lng is double ? lng : double.tryParse(lng.toString());
+    final latitude =
+        lat is double ? lat : double.tryParse(lat.toString());
+    final longitude =
+        lng is double ? lng : double.tryParse(lng.toString());
 
-      if (latitude == null || longitude == null) return 'Endereço não disponível';
-
-      final placemarks = await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isEmpty) return 'Endereço não disponível';
-
-      final place = placemarks.first;
-      return '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}';
-    } catch (e) {
-      print('Erro ao converter coordenadas em endereço: $e');
+    if (latitude == null || longitude == null) {
       return 'Endereço não disponível';
     }
+
+    final url = Uri.parse(
+      'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&addressdetails=1'
+    );
+
+    final response = await http.get(url, headers: {
+      'User-Agent': 'recicle-app/1.0'
+    });
+
+    if (response.statusCode != 200) {
+      return 'Endereço não disponível';
+    }
+
+    final data = json.decode(response.body);
+
+    final address = data['address'];
+    if (address == null) return 'Endereço não disponível';
+
+    final street = address['road'] ?? '';
+    final suburb = address['suburb'] ?? '';
+    final city = address['city'] ?? address['town'] ?? address['village'] ?? '';
+
+    return '$street, $suburb, $city';
+  } catch (e) {
+    print('Erro ao converter coordenadas em endereço: $e');
+    return 'Endereço não disponível';
   }
+}
 }

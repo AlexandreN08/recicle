@@ -37,7 +37,6 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
     }
   }
 
-  /// Formata DateTime para padrão brasileiro
   String formatDateTime(DateTime? dt) {
     if (dt == null) return 'Horário não definido';
     final formatter = DateFormat('dd/MM/yyyy – HH:mm');
@@ -122,7 +121,35 @@ class _PontosColetaScreenState extends State<PontosColetaScreen> {
                               Row(
                                 children: [
                                   ElevatedButton(
-                                    onPressed: () => _controller.confirmColeta(ponto.id, ponto.userId),
+                                    onPressed: () {
+                                    showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Confirmar Coleta'),
+        content: const Text('Tem certeza que deseja confirmar a coleta deste descarte?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); 
+
+              // Chama o método que confirma no Firestore
+              await _controller.confirmColeta(ponto.id, ponto.userId);
+
+              setState(() {});
+            },
+            child: const Text('Confirmar'),
+          ),
+        ],
+      );
+    },
+  );
+},
+
                                     child: const Text('Confirmar Coleta'),
                                   ),
                                   const SizedBox(width: 10),

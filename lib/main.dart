@@ -13,7 +13,6 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialização do Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -48,7 +47,6 @@ class AuthWrapperMobile extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Enquanto verifica autenticação
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: Colors.white,

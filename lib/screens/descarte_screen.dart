@@ -91,7 +91,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ----------- TÍTULO MATERIAIS -----------
               const Text(
                 'Selecione os materiais:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -146,7 +145,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
 
               const SizedBox(height: 20),
 
-              // ----------- TÍTULO IMAGEM -----------
               Text(
                 'Carregue uma imagem dos materiais a serem descartados:',
                 style: const TextStyle(
@@ -180,7 +178,6 @@ class _DescarteScreenState extends State<DescarteScreen> {
 
               const SizedBox(height: 20),
 
-              // ----------- TÍTULO HORÁRIO -----------
               Text(
                 'Selecione um Horario disponível para coleta:',
                 style: const TextStyle(

@@ -16,12 +16,12 @@ class HomeScreen extends StatelessWidget {
   final HomeController _controller = HomeController();
 
   final List<Color> cardColors = [
-    Colors.green,    // 1 - Verde
-    Colors.blue,     // 2 - Azul
-    Colors.red,      // 3 - Vermelho
-    Colors.yellow,   // 4 - Amarelo
-    Colors.orange,   // 5 - Laranja
-    Colors.brown,    // 6 - Marrom
+    Colors.green,    
+    Colors.blue,     
+    Colors.red,      
+    Colors.yellow,   
+    Colors.orange,   
+    Colors.brown,    
   ];
 
   @override
